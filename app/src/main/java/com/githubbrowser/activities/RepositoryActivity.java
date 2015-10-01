@@ -193,17 +193,23 @@ public class RepositoryActivity extends AppCompatActivity implements GitHubQuery
 
         if (id == R.id.action_star) {
             if(mStarred){
-                //item.setIcon(R.drawable.star_on_normal_holo_light);
                 mQuerySender.sendUserQuery(getApplicationContext(), "DELETE",
                         GitHubQuerySender.QueryType.DELETE_REPO_UNSTAR,
                         "user/starred/" + mOwnerInfo.getUserName() + "/" + mRepoInfo.getRepoName());
             }else{
-                //item.setIcon(R.drawable.star_off_normal_holo_light);
                 mQuerySender.sendUserQuery(getApplicationContext(), "PUT",
                         GitHubQuerySender.QueryType.PUT_REPO_STAR,
                         "user/starred/" + mOwnerInfo.getUserName() + "/" + mRepoInfo.getRepoName());
             }
             return true;
+        }
+
+        if(id == R.id.action_logout){
+            Intent intent = new Intent(RepositoryActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            Utils.savePreferences(LoginActivity.LOGIN_AUTHORIZED, false, getApplicationContext());
+            startActivity(intent);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

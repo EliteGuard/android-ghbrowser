@@ -29,16 +29,14 @@ import com.githubbrowser.utilities.Utils;
 
 import org.json.JSONException;
 
-public class UserActivity extends AppCompatActivity implements ReposListFragment.OnReposFragmentInteractionListener, GitHubQuerySender.QueryListener{
+public class UserActivity extends AppCompatActivity implements GitHubQuerySender.QueryListener{
 
     public static final String USER_AVATAR_URL = "avatar_url";
-    //public static final String USER_DATA_JSON = "user_data_json";
 
     private SharedPreferences mSharedPrefs;
     private DBHelper mDBHelper;
     private GitHubQuerySender mQuerySender;
     private ImageLoader mImageLoader;
-    //private Cursor mCursorUserData;
     private UserDataInfo mUserInfo;
 
     private TextView mTextUsername;
@@ -132,7 +130,6 @@ public class UserActivity extends AppCompatActivity implements ReposListFragment
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_user, menu);
 
         return super.onCreateOptionsMenu(menu);
@@ -142,20 +139,20 @@ public class UserActivity extends AppCompatActivity implements ReposListFragment
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_search) {
             Intent intent = new Intent(getApplicationContext(), SearchUsersActivity.class);
             intent.putExtra(SearchUsersActivity.ARG_USERS_TYPE, 0);
             startActivity(intent);
         }
+        if(id == R.id.action_logout){
+            Intent intent = new Intent(UserActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            Utils.savePreferences(LoginActivity.LOGIN_AUTHORIZED, false, getApplicationContext());
+            startActivity(intent);
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public void onReposFragmentInteraction(Uri uri) {
-
     }
 
     @Override
@@ -174,10 +171,10 @@ public class UserActivity extends AppCompatActivity implements ReposListFragment
         public Fragment getItem(int position) {
 
             switch (position) {
-                case 0: // Fragment # 0 - This will show FirstFragment
-                    return ReposListFragment.newInstance(position, "Page # 1");
-                case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return ReposListFragment.newInstance(position, "Page # 2");
+                case 0:
+                    return ReposListFragment.newInstance(position);
+                case 1:
+                    return ReposListFragment.newInstance(position);
                 default:
                     return null;
             }

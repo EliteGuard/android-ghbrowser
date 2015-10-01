@@ -33,21 +33,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-//import static com.githubbrowser.activities.SearchUsersActivity.UsersType.*;
-
 public class SearchUsersActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         GitHubQuerySender.QueryListener{
 
     public static final String ARG_USERS_TYPE = "show_user_type";
-
-    /*public enum UsersType{
-        ALL,
-        FOLLOWERS,
-        FOLLOWING
-    }*/
 
     private DBHelper mDBHelper;
     private GitHubQuerySender mQuerySender;
@@ -56,7 +45,7 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
     ListView mListViewUsers;
     SimpleCursorAdapter mAdapter;
     private String mSearchText;
-    //private UsersType mUserType;
+
     int mUserType;
     String mUserName;
     String mRepoName;
@@ -70,8 +59,6 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
         mQuerySender = new GitHubQuerySender();
         mQuerySender.setQueryListner(this);
         mImageLoader = new ImageLoader(getApplicationContext());
-        //mQuerySender.sendUserQuery(getApplicationContext(), GitHubQuerySender.QueryType.GET_USER_FOLLOWERS, "user/followers");
-        //mQuerySender.sendUserQuery(getApplicationContext(), GitHubQuerySender.QueryType.GET_USER_FOLLOWING, "user/following");
 
         setContentView(R.layout.activity_users_search);
 
@@ -83,7 +70,6 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
                 new String[] { DBHelper.COLUMN_USERS_NAME, DBHelper.COLUMN_USERS_AVATAR_URL},
                 new int[] { R.id.name, R.id.avatar}, 0);
         mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder(){
-            /** Binds the Cursor column defined by the specified index to the specified view */
             public boolean setViewValue(View view, Cursor cursor, int columnIndex){
                 if(view.getId() == R.id.avatar){
                     mImageLoader.DisplayImage(
@@ -98,7 +84,6 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
         handleIntent(getIntent());
 
         mSearchText = "";
-        //getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
@@ -122,7 +107,6 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    // this is your adapter that will be filtered
                     mAdapter.getFilter().filter(query);
                     return true;
                 }
@@ -137,12 +121,13 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        /*if (id == R.id.action_search) {
-            Intent intent = new Intent(getApplicationContext(), SearchUsersActivity.class);
-            intent.putExtra(SearchUsersActivity.ARG_USERS_TYPE, 0);
+        if(id == R.id.action_logout){
+            Intent intent = new Intent(SearchUsersActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            Utils.savePreferences(LoginActivity.LOGIN_AUTHORIZED, false, getApplicationContext());
             startActivity(intent);
-        }*/
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -154,9 +139,7 @@ public class SearchUsersActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void handleIntent(Intent intent) {
-        //if(mUserType==null){
-            mUserType = intent.getIntExtra(ARG_USERS_TYPE, 0);
-        //}
+        mUserType = intent.getIntExtra(ARG_USERS_TYPE, 0);
         switch (mUserType){
             case 0:
                 if (Intent.ACTION_SEARCH.equals(intent.getAction())) {

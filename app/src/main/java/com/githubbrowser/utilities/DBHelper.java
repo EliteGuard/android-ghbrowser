@@ -8,10 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    /** Database name */
     private static String DBNAME = "ghbrowser_db";
 
-    /** Version number of the database */
     private static int VERSION = 1;
 
     public static final String TABLE_REPOS = "t_repos";
@@ -30,8 +28,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_REPOS_CONTRIBUTOR_COUNT = "c_contrib_count";
     public static final String COLUMN_REPOS_SIZE = "c_size";
     public static final String COLUMN_REPOS_LANGUAGES = "c_languages";
-    //public static final String COLUMN_REPOS_ = "c_";
-
 
     public static final String TABLE_USERS = "t_users";
     public static final String COLUMN_USERS_KEYID = "_id";
@@ -53,20 +49,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_USER_TOTAL_PRIVATE_REPOS_COUNT = "c_total_private_repos";
     public static final String COLUMN_USER_OWNED_PRIVATE_REPOS_COUNT = "c_owned_private_repos";
 
-
-    /** An instance variable for SQLiteDatabase */
     private SQLiteDatabase mDB;
 
-    /** Constructor */
     public DBHelper(Context context) {
         super(context, DBNAME, null, VERSION);
         this.mDB = getWritableDatabase();
     }
 
-    /** This is a callback method, invoked when the method
-     * getReadableDatabase() / getWritableDatabase() is called
-     * provided the database does not exists
-     * */
     @Override
     public void onCreate(SQLiteDatabase db) {
 
@@ -109,10 +98,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 + COLUMN_REPOS_LANGUAGES + " text DEFAULT 'Not specified') ";
 
         db.execSQL(sql);
-
-        /*sql = "insert into " + TABLE_REPOS + " ( " + COLUMN_REPO_NAME + " ) "
-                + " values ( 'My Repo' )";*/
-        //db.execSQL(sql);
 
     }
 
@@ -202,15 +187,9 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_USERS_NAME, userName);
         values.put(COLUMN_USERS_ID, userId);
         values.put(COLUMN_USERS_AVATAR_URL, userAvatarUrl);
-        //values.put(COLUMN_USERS_FOLLOWER, 1);
         db.insert(TABLE_USERS, null, values);
 
         updateUser(userId, COLUMN_USERS_FOLLOWER, 1);
-        /*ContentValues updateValues = new ContentValues();
-        updateValues.put(COLUMN_USERS_FOLLOWER, 1);
-        db.update(TABLE_USERS, updateValues,
-                COLUMN_USERS_ID + "=?",
-                new String[]{String.valueOf(userId)});*/
     }
 
     public void insertFollowing(String userName, int userId, String userAvatarUrl){
@@ -219,15 +198,9 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_USERS_NAME, userName);
         values.put(COLUMN_USERS_ID, userId);
         values.put(COLUMN_USERS_AVATAR_URL, userAvatarUrl);
-        //values.put(COLUMN_USERS_FOLLOWING, 1);
         db.insert(TABLE_USERS, null, values);
 
         updateUser(userId, COLUMN_USERS_FOLLOWING, 1);
-        /*ContentValues updateValues = new ContentValues();
-        updateValues.put(COLUMN_USERS_FOLLOWING, 1);
-        db.update(TABLE_USERS, updateValues,
-                COLUMN_USERS_ID + "=?",
-                new String[]{String.valueOf(userId)});*/
     }
 
     public void insertContributor(String userName, int userId, String userAvatarUrl, int contributorTo){
@@ -236,15 +209,9 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_USERS_NAME, userName);
         values.put(COLUMN_USERS_ID, userId);
         values.put(COLUMN_USERS_AVATAR_URL, userAvatarUrl);
-        //values.put(COLUMN_USERS_FOLLOWING, 1);
         db.insert(TABLE_USERS, null, values);
 
         updateUser(userId, COLUMN_USERS_CONTRIBUTOR_TO, contributorTo);
-        /*ContentValues updateValues = new ContentValues();
-        updateValues.put(COLUMN_USERS_FOLLOWING, 1);
-        db.update(TABLE_USERS, updateValues,
-                COLUMN_USERS_ID + "=?",
-                new String[]{String.valueOf(userId)});*/
     }
 
     public Cursor getRepositories(String selection, String [] args){
@@ -262,19 +229,9 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(COLUMN_REPOS_STAR_COUNT, repoStar);
         values.put(COLUMN_REPOS_FORK_COUNT, repoFork);
         values.put(COLUMN_REPOS_SIZE, repoSize);
-        /*values.put(COLUMN_REPOS_COMMITS_COUNT, );
-        values.put(COLUMN_REPOS_BRANCHES_COUNT, );
-        values.put(COLUMN_REPOS_RELEASES_COUNT, );*/
-        /*values.put(COLUMN_REPOS_CONTRIBUTOR_COUNT, );
-        values.put(COLUMN_REPOS_LANGUAGES, );*/
         db.insert(TABLE_REPOS, null, values);
 
         updateRepo(repoId, COLUMN_REPOS_OWNED, 1);
-        /*ContentValues updateValues = new ContentValues();
-        updateValues.put(COLUMN_REPOS_OWNED, 1);
-        db.update(TABLE_REPOS, updateValues,
-                COLUMN_REPOS_ID+"=?",
-                new String[]{String.valueOf(repoId)});*/
     }
 
     public void insertStarredRepository(String repoName, int repoId, int repoOwner, int repoStar, int repoFork, long repoSize){
@@ -289,11 +246,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.insert(TABLE_REPOS, null, values);
 
         updateRepo(repoId, COLUMN_REPOS_STARRED, 1);
-        /*ContentValues updateValues = new ContentValues();
-        updateValues.put(COLUMN_REPOS_STARRED, 1);
-        db.update(TABLE_REPOS, updateValues,
-                COLUMN_REPOS_ID + "=?",
-                new String[]{String.valueOf(repoId)});*/
     }
 
     public void updateRepo(int repoId, String column, String value){

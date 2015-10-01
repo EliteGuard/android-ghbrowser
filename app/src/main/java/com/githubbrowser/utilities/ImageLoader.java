@@ -44,7 +44,6 @@ public class ImageLoader {
         else
         {
             queuePhoto(url, imageView);
-            //imageView.setImageResource(stub_id);
         }
     }
          

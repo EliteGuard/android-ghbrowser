@@ -11,10 +11,8 @@ import com.githubbrowser.utilities.DBHelper;
 public class UserDataProvider extends ContentProvider{
     public static final String PROVIDER_NAME = "com.githubbrowser.userdata";
 
-    /** A uri to do operations on cust_master table. A content provider is identified by its uri */
     public static final Uri CONTENT_USERDATA = Uri.parse("content://" + PROVIDER_NAME + "/userdata" );
 
-    /** Constants to identify the requested operation */
     private static final int USERDATA = 1;
 
     private static final UriMatcher uriMatcher ;
@@ -23,10 +21,8 @@ public class UserDataProvider extends ContentProvider{
         uriMatcher.addURI(PROVIDER_NAME, "userdata", USERDATA);
     }
 
-    /** This content provider does the database operations by this object */
     DBHelper mDB;
 
-    /** A callback method which is invoked when the content provider is starting up */
     @Override
     public boolean onCreate() {
         mDB = new DBHelper(getContext());
@@ -38,7 +34,6 @@ public class UserDataProvider extends ContentProvider{
         return null;
     }
 
-    /** A callback method which is by the default content uri */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 

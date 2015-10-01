@@ -33,9 +33,6 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * A login screen that offers login via email/password.
- */
 public class LoginActivity extends Activity{
 
     public static final String LOGIN_USERNAME = "login_username";
@@ -59,9 +56,9 @@ public class LoginActivity extends Activity{
         mDBHelper = new DBHelper(getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        // Set up the login form.
         mLoginFormView = (LinearLayout) findViewById(R.id.login_form);
         mUserView = (EditText) findViewById(R.id.username);
+        mUserView.setText(mSharedPrefs.getString(LOGIN_USERNAME, ""));
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -99,65 +96,53 @@ public class LoginActivity extends Activity{
         }
     }
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     public void attemptLogin() {
         if (mAuthTask != null) {
             return;
         }
 
-        // Reset errors.
         mUserView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
+        mLoginFormView.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
+
         String username = mUserView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
-        // Check for a valid email address.
         if (TextUtils.isEmpty(username)) {
             mUserView.setError(getString(R.string.error_field_required));
             focusView = mUserView;
             cancel = true;
         }
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
+            mLoginFormView.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.GONE);
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private final String mUsername;
         private final String mPassword;
+        int responseCode;
 
         UserLoginTask(String email, String password) {
             mUsername = email;
@@ -178,8 +163,8 @@ public class LoginActivity extends Activity{
                     String authString = "Basic " + Base64.encodeToString(sUserCode.getBytes(), Base64.DEFAULT);
                     connection.setRequestProperty("Authorization", authString);
 
-                    int responseCode = connection.getResponseCode();
-                    if(connection.getResponseCode()== HttpsURLConnection.HTTP_OK){
+                    responseCode = connection.getResponseCode();
+                    if(responseCode== HttpsURLConnection.HTTP_OK){
                         BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                         StringBuffer sb = new StringBuffer();
                         int ch;
@@ -223,8 +208,6 @@ public class LoginActivity extends Activity{
                     Utils.savePreferences(LOGIN_AUTHORIZED, true, getApplicationContext());
                     Utils.savePreferences(LOGIN_USERNAME, mUsername, getApplicationContext());
                     Utils.savePreferences(LOGIN_PASSWORD, mPassword, getApplicationContext());
-                    /*Utils.savePreferences(UserActivity.USER_AVATAR_URL, res.getString(UserActivity.USER_AVATAR_URL), getApplicationContext());
-                    Utils.savePreferences(UserActivity.USER_DATA_JSON, res.toString(), getApplicationContext());*/
                     mDBHelper.setUserData(
                             res.getString("login"),
                             res.getInt("id"),
@@ -238,9 +221,13 @@ public class LoginActivity extends Activity{
                     Intent intent = new Intent(getApplicationContext(), UserActivity.class);
                     startActivity(intent);
                     finish();
-                } else {
-                    //mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    //mPasswordView.requestFocus();
+                }
+                if(responseCode == HttpURLConnection.HTTP_NOT_FOUND || responseCode==HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    mLoginFormView.setVisibility(View.VISIBLE);
+                    mProgressBar.setVisibility(View.GONE);
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mUserView.setError(getString(R.string.error_invalid_username));
+                    Utils.showToast("Invalid credentials!", getApplicationContext());
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

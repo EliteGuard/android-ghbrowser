@@ -12,11 +12,9 @@ public class UsersReposProvider extends ContentProvider {
 
     public static final String PROVIDER_NAME = "com.githubbrowser.usersrepos";
 
-    /** A uri to do operations on cust_master table. A content provider is identified by its uri */
     public static final Uri CONTENT_REPOSITORIES = Uri.parse("content://" + PROVIDER_NAME + "/repositories" );
     public static final Uri CONTENT_USERS = Uri.parse("content://" + PROVIDER_NAME + "/users" );
 
-    /** Constants to identify the requested operation */
     private static final int REPOSITORIES = 1;
     private static final int USERS = 2;
 
@@ -27,10 +25,8 @@ public class UsersReposProvider extends ContentProvider {
         uriMatcher.addURI(PROVIDER_NAME, "users", USERS);
     }
 
-    /** This content provider does the database operations by this object */
     DBHelper mDB;
 
-    /** A callback method which is invoked when the content provider is starting up */
     @Override
     public boolean onCreate() {
         mDB = new DBHelper(getContext());
@@ -42,7 +38,6 @@ public class UsersReposProvider extends ContentProvider {
         return null;
     }
 
-    /** A callback method which is by the default content uri */
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor cursor;
